@@ -10,18 +10,19 @@ pub struct Player {
     pub visina: u64,
     pub sirina: u64,
     pub izgled: Izgled,
-    pub skok: f64
+    pub skok: f64,
 }
 
 impl Player {
-    pub fn new() -> Self { // naredi novega igralca na x, y ( (0,0) mestu)
-        Player { 
-            x: 0., 
-            y: 0., 
+    pub fn new() -> Self {
+        // naredi novega igralca na x, y ( (0,0) mestu)
+        Player {
+            x: 0.,
+            y: 0.,
             visina: 1,
             sirina: 1,
             izgled: Izgled::Kvadrat,
-            skok: 6.5
+            skok: 6.5,
         }
     }
 
