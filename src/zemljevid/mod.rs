@@ -1,13 +1,8 @@
 use crate::{ovire::*, player::*};
 
-enum Ovire {
-    Kvadrat,
-    Trikotnik,
-}
-
 pub struct Zemljevid {
     stopnja: Stopnja,
-    poligon: Vec<(f64, Ovire)>,
+    poligon: Vec<(f32, Ovira)>,
 }
 
 enum Stopnja {
@@ -27,6 +22,6 @@ impl Zemljevid {
 
 // work in progress
 // struct OviraZemlj {
-//     pozicija: f64,
+//     pozicija: f32,
 //     lik: Ovire,
 // }
