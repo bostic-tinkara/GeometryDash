@@ -33,7 +33,7 @@ impl Zemljevid {
                     if !rng.random_bool(0.5) { // se dodatno filtrira ovire
                         return None;
                     }
-
+                                
                     let ovira = if rng.random_bool(0.5) {
                         Ovira::Pravokotnik { visina: dim, sirina: dim }
                     } else {
