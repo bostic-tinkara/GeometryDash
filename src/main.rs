@@ -4,6 +4,7 @@ mod testi;
 mod zemljevid;
 
 use macroquad::prelude::*;
+use std::time::Duration;
 use ovire::*;
 use player::*;
 use zemljevid::*;
@@ -30,8 +31,30 @@ async fn main() {
             match ovira.preveri_trk(*o_x, trenutna_tla, &igralec) {
                 IzidTrka::None => {}
                 IzidTrka::Smrt => {
-                    println!("Umrl si!");
-                    return;
+                    let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
+                    clear_background(bubble_gum);
+                    draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
+                    zemljevid.narisi(osnovna_tla);
+                    igralec.narisi(BLUE);
+
+                    next_frame().await;
+
+                    let cas_smrti = get_time();
+                    while get_time() - cas_smrti < 1.0 {
+                        let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
+                        clear_background(bubble_gum);
+                        draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
+                        zemljevid.narisi(osnovna_tla);
+                        let sinus = (get_time() * 25.0).sin();
+                        if sinus > 0.0 {
+                        igralec.narisi(BLUE);
+                        }
+                        next_frame().await;
+                    }
+                    zemljevid = Zemljevid::new(Stopnja::Beginner);
+                    igralec.y = osnovna_tla - igralec.stranica;
+                    igralec.y_hitrost = 0.0;
+                    break;
                 }
                 IzidTrka::PristaniNaOviri(visina) => {
                     na_oviri = true;

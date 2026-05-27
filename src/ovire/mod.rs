@@ -81,6 +81,8 @@ impl Ovira {
                 let w = *sirina;
                 let h = *visina;
 
+
+
                 // izračun oglišč trikotnika // UPORABLJAVA LEVO SPODNJE KRAJIŠČE ZA LAŽJI IZRAČUN POZICIJE
                 let v1 = vec2(x + w / 2.0, y - h );   // zgornje
                 let v2 = vec2(x , y ); // levo spodaj
@@ -113,15 +115,26 @@ impl Ovira {
             },
 
             Ovira::Trikotnik { visina, sirina } => {
-                // Zaenkrat preprosto preverimo, ali se igralec dotika pravokotnika, ki obdaja trikotnik.
-                // To ni popolna detekcija trka s trikotnikom, ampak je dovolj za osnovno delovanje.
-                let o_pravokotnik = Rect::new(
-                    o_x - sirina / 2.0,
-                    o_y - visina / 2.0,
-                    *sirina,
-                    *visina,
+                let w = *sirina;
+                let h = *visina;
+
+                // Spodnji del trikotnika (širša podlaga)
+                let spodnji_hitbox = Rect::new(
+                    o_x + (w * 0.1),        // Malo ožji od dejanskega dna
+                    o_y - (h * 0.4),        // Pokriva spodnjih 40% višine
+                    w * 0.8,
+                    h * 0.4,
                 );
-                if p_pravokotnik.overlaps(&o_pravokotnik) {
+    
+                // Zgornji del trikotnika (ozka špica)
+                let zgornji_hitbox = Rect::new(
+                    o_x + (w * 0.35),       // Močno zamaknjen navznoter, da je ozek
+                    o_y - h,                // Gre vse do vrha špice
+                    w * 0.3,                // Širina špice je le 30% celotne širine
+                    h * 0.6,                // Pokriva zgornjih 60% višine
+                );
+
+                if p_pravokotnik.overlaps(&spodnji_hitbox) || p_pravokotnik.overlaps(&zgornji_hitbox) {
                     IzidTrka::Smrt
                 } else {
                     IzidTrka::None
