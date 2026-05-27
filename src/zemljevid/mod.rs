@@ -1,6 +1,10 @@
+use macroquad::color::PINK;
 use macroquad::prelude::*;
+use ::rand::prelude::*;
+use ::rand::seq::SliceRandom;
 
-use crate::{ovire::*, player::*};
+use crate::ovire::*;
+use crate::player::*;
 
 pub enum Stopnja {
     Beginner,
@@ -15,14 +19,34 @@ pub struct Zemljevid {
 impl Zemljevid {
     pub fn new(stopnja: Stopnja) -> Self {
         let poligon = match stopnja {
-            Stopnja::Beginner => vec![
-                (400.0, Ovira::nov_trikotnik(40.0, 40.0)),
-                (600.0, Ovira::nov_kvadrat(50.0)),
-                (800.0, Ovira::nov_kvadrat(50.0)), // Dva kvadrata skupaj
-                (1000.0, Ovira::nov_trikotnik(40.0, 40.0)),
-                (1200.0, Ovira::nov_trikotnik(40.0, 40.0)), // Dvojna špica                
-            ],
-        };
+            Stopnja::Beginner =>
+                {
+                let mut rng = ::rand::rng();
+                let dim = rng.random_range(30.0..60.0);
+                let min_razdalja = 150.0;
+                let mut koordinata = 400.0;
+                let list = (0..20)
+                .filter_map(|_| {
+
+                    koordinata += rng.random_range(min_razdalja..min_razdalja + 80.0);
+                
+                    if !rng.random_bool(0.5) { // se dodatno filtrira ovire
+                        return None;
+                    }
+
+                    let ovira = if rng.random_bool(0.5) {
+                        Ovira::Pravokotnik { visina: dim, sirina: dim }
+                    } else {
+                        Ovira::Trikotnik { visina: dim, sirina: dim }
+                    };
+                
+                    Some((koordinata, ovira))
+                    })
+                    .collect();
+
+                list
+            
+        }};
 
         Zemljevid {
             stopnja,
