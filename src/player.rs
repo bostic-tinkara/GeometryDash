@@ -8,6 +8,7 @@ pub struct Player {
     pub skok: f32,      // koliko lahko preskoči
     pub y_hitrost: f32, // Nova spremenljivka za hitrost skoka/padanja
     pub skok_moc: f32,  // Kako močan je začetni odriv
+    pub rotacija: f32,
 }
 
 impl Player {
@@ -20,6 +21,7 @@ impl Player {
             skok: 150., // lahko preskoči oviro do višine 150
             y_hitrost: 0.,
             skok_moc: -9., //negativno, ker gremo navzgor
+            rotacija: 0.,
         }
     }
 
@@ -47,13 +49,28 @@ impl Player {
 
     pub fn narisi(&self, color: Color) {
         let s = self.stranica;
-        draw_rectangle(
+        let sredina_stranice = s / 2.0;
+        draw_poly_lines(
+            self.x + s / 2.0, 
+            self.y + s / 2.0, 
+            4, 
+            s * 0.707, // Matematika (s / kvadratni koren iz 2), da se ujema z oglišči kocke
+            self.rotacija + 45.0, // Zamik za 45 stopinj, da se ujema s kvadratom
+            1.5, 
+            WHITE
+            
+        );
+        draw_rectangle_ex(
             // igralčeva oblika je kvadrat
             self.x,
             self.y,
             s,
             s,
-            color,
-        )
+            DrawRectangleParams{
+                offset: vec2(-sredina_stranice,  -sredina_stranice), // nastavimo offset, da se kvadrat vrti okoli svojega središča
+                rotation: self.rotacija.to_radians(), //hočemo radiane
+                color,
+            },
+        );
     }
 }
