@@ -1,5 +1,5 @@
 use crate::ovire::*;
-use macroquad::prelude::*;
+use macroquad::{color, prelude::*};
 
 pub struct Player {
     pub x: f32, // koordinati, kjer se nahaja
@@ -49,28 +49,32 @@ impl Player {
 
     pub fn narisi(&self, color: Color) {
         let s = self.stranica;
-        let sredina_stranice = s / 2.0;
-        draw_poly_lines(
-            self.x + s / 2.0, 
-            self.y + s / 2.0, 
-            4, 
-            s * 0.707, // Matematika (s / kvadratni koren iz 2), da se ujema z oglišči kocke
-            self.rotacija + 45.0, // Zamik za 45 stopinj, da se ujema s kvadratom
-            1.5, 
-            WHITE
-            
-        );
+        let pol_stranice = s / 2.0;
+        let rotacija = self.rotacija.to_radians();
+
+        // igralec je kvadrat
         draw_rectangle_ex(
-            // igralčeva oblika je kvadrat
-            self.x,
-            self.y,
+            self.x + pol_stranice,
+            self.y + pol_stranice,
             s,
             s,
-            DrawRectangleParams{
-                offset: vec2(-sredina_stranice,  -sredina_stranice), // nastavimo offset, da se kvadrat vrti okoli svojega središča
-                rotation: self.rotacija.to_radians(), //hočemo radiane
-                color,
+            DrawRectangleParams {
+                // nastavimo offset, da se kvadrat vrti okoli svojega središča
+                offset: vec2(0.5, 0.5), 
+                rotation: rotacija,
+                color: color,
             },
         );
+
+        draw_poly_lines( // meja okoli kvadrata
+            self.x + pol_stranice,
+            self.y + pol_stranice,
+            4, 
+            s * 0.7071, // Matematika (s / kvadratni koren iz 2), da se ujema z oglišči kocke
+            self.rotacija + 45.0, // Zamik za 45 stopinj, da se ujema s kvadratom
+            1.5,
+            WHITE
+        );
     }
+
 }

@@ -19,69 +19,66 @@ async fn main() {
 
     let mut score_accumulator: f32 = 0.0;
     let mut best_score: u32 = 0;
+    
+    let mut dead = false;
+    let mut cas_smrti = 0.0;
 
     loop {
+
+        //tla, kjer je igralec, če ni na nobeni oviri (lahko je tudi na oviri, ne samo na tleh)
+        let osnovna_tla = screen_height() - 100.0; 
+        let current_score = score_accumulator as u32;
+
+
+        // ob trku
+        if dead {
+            let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
+            clear_background(bubble_gum);
+            draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
+            zemljevid.narisi(osnovna_tla);
+            
+            let sinus = (get_time() * 25.0).sin(); // ko igralec umre, utripa
+            if sinus > 0.0 {
+                igralec.narisi(BLUE);
+            }
+
+            if get_time() - cas_smrti > 1.0 { // igra se ponovno začne
+                score_accumulator = 0.0;
+                zemljevid = Zemljevid::new(Stopnja::Beginner);
+                igralec.y = osnovna_tla - igralec.stranica;
+                igralec.y_hitrost = 0.0;
+                igralec.rotacija = 0.0;
+                dead = false;
+            }
+
+        }
+
+        else { // set up za igro
+
         let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
         clear_background(bubble_gum);
 
-        let dt = get_frame_time();
-        score_accumulator += 10.0 * dt;
-        let current_score = score_accumulator as u32;
-
-        let osnovna_tla = screen_height() - 100.0; //tla kjer je igralec, če ni na nobeni ovire
-        let mut trenutna_tla = osnovna_tla; //lahko je tudi na oviri ne samo na tleh
+        let mut trenutna_tla = osnovna_tla;
         let mut na_oviri = false;
 
         zemljevid.posodobi();
 
+        let dt = get_frame_time();
+        score_accumulator += 10.0 * dt;
+
         for (o_x, ovira) in &zemljevid.poligon {
             match ovira.preveri_trk(*o_x, trenutna_tla, &igralec) {
-                IzidTrka::None => {}
+                IzidTrka::None => {},
                 IzidTrka::Smrt => {
-                    let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
-                    clear_background(bubble_gum);
-                    draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
-                    zemljevid.narisi(osnovna_tla);
-                    igralec.narisi(BLUE);
+                    dead = true;
+                    cas_smrti = get_time();
 
-                    next_frame().await;
-
-                    let cas_smrti = get_time();
-                    while get_time() - cas_smrti < 1.0 {
-                        let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
-                        clear_background(bubble_gum);
-                        draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
-                        zemljevid.narisi(osnovna_tla);
-                        draw_text(
-                            &format!("Score: {}", current_score),
-                            10.0,
-                            30.0,
-                            30.0,
-                            WHITE,
-                        );
-                        draw_text(
-                            &format!("Best Score: {}", best_score),
-                            10.0,
-                            60.0,
-                            30.0,
-                            WHITE,
-                        );
-                        let sinus = (get_time() * 25.0).sin();
-                        if sinus > 0.0 {
-                            igralec.narisi(BLUE);
-                        }
-                        next_frame().await;
-                    }
                     if current_score > best_score {
                         best_score = current_score;
                     }
-                    score_accumulator = 0.0;
 
-                    zemljevid = Zemljevid::new(Stopnja::Beginner);
-                    igralec.y = osnovna_tla - igralec.stranica;
-                    igralec.y_hitrost = 0.0;
                     break;
-                }
+                },
                 IzidTrka::PristaniNaOviri(visina) => {
                     na_oviri = true;
                     trenutna_tla = visina;
@@ -111,6 +108,7 @@ async fn main() {
         draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
         zemljevid.narisi(osnovna_tla);
         igralec.narisi(BLUE);
+        }
 
         draw_text(
             &format!("Score: {}", current_score),
@@ -119,6 +117,7 @@ async fn main() {
             30.0,
             WHITE,
         );
+
         draw_text(
             &format!("Best Score: {}", best_score),
             10.0,
@@ -129,4 +128,5 @@ async fn main() {
 
         next_frame().await
     }
+
 }
