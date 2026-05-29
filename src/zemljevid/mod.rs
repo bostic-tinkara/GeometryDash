@@ -1,10 +1,8 @@
 use macroquad::color::PINK;
 use macroquad::prelude::*;
 use ::rand::prelude::*;
-use ::rand::seq::SliceRandom;
 
 use crate::ovire::*;
-use crate::player::*;
 
 pub enum Stopnja {
     Beginner,
@@ -22,22 +20,31 @@ impl Zemljevid {
             Stopnja::Beginner =>
                 {
                 let mut rng = ::rand::rng();
-                let dim = rng.random_range(30.0..60.0);
-                let min_razdalja = 150.0;
-                let mut koordinata = 400.0;
-                let list = (0..20)
+                let min_razdalja = 200.0; // min. razdalja med ovirami
+                let mut koordinata = 400.0; // tu se zacnejo koordinate ovir
+                let list = (0..50)
                 .filter_map(|_| {
 
-                    koordinata += rng.random_range(min_razdalja..min_razdalja + 80.0);
-                
-                    if !rng.random_bool(0.5) { // se dodatno filtrira ovire
+                    koordinata += rng.random_range(min_razdalja..(min_razdalja + 100.0));
+
+                    if rng.random_bool(1.0 / 3.0) { // se dodatno filtriramo ovire, tretjino jih ignorira
                         return None;
                     }
-                                
+
                     let ovira = if rng.random_bool(0.5) {
-                        Ovira::Pravokotnik { visina: dim, sirina: dim }
+                        
+                        let dim_kvadrat = rng.random_range(20.0..60.0);
+                        Ovira::Pravokotnik { // kvadrat
+                            visina: dim_kvadrat, 
+                            sirina: dim_kvadrat 
+                        }
                     } else {
-                        Ovira::Trikotnik { visina: dim, sirina: dim }
+
+                        let dim_trikotnik = rng.random_range(30.0..50.0);
+                        Ovira::Trikotnik { // enakostranični trikotnik
+                            visina: dim_trikotnik * 3.0_f32.sqrt() / 2.0,
+                            sirina: dim_trikotnik 
+                        }
                     };
                 
                     Some((koordinata, ovira))

@@ -18,6 +18,7 @@ pub enum Ovira {
     },
 }
 
+#[derive(Debug)]
 pub enum IzidTrka {
     None,
     Smrt,
@@ -47,19 +48,20 @@ impl Ovira {
         }
     }
 
-    pub fn naredi_stolp(visina: f32) -> Self {
-        if visina <= 0. {
-            Ovira::Pravokotnik { 
-                visina: 0.,
-                sirina: 0.
-            }
-        } else {
-            Ovira::Pravokotnik { 
-                visina: visina,
-                sirina: 50.
-            }
-        }
-    }
+    // trenutno ne potrebujeva te funkcije
+    // pub fn naredi_stolp(visina: f32) -> Self {
+    //     if visina <= 0. {
+    //         Ovira::Pravokotnik { 
+    //             visina: 0.,
+    //             sirina: 0.
+    //         }
+    //     } else {
+    //         Ovira::Pravokotnik { 
+    //             visina: visina,
+    //             sirina: 50.
+    //         }
+    //     }
+    // }
 
     pub fn narisi(&self, x: f32, y: f32, color: Color) {
         match self {
@@ -91,7 +93,7 @@ impl Ovira {
         }
     }
 
-    pub fn preveri_trk(&self, o_x: f32, o_y:f32, p: &Player) -> IzidTrka {
+    pub fn preveri_trk(&self, o_x: f32, o_y: f32, p: &Player) -> IzidTrka {
         let p_pravokotnik = Rect::new(p.x, p.y, p.stranica, p.stranica); 
         // pravokotnik, ki predstavlja igralca - p
 

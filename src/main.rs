@@ -14,7 +14,7 @@ async fn main() {
     next_frame().await; // počakamo, da se naloži ekran
 
     let gravitacija = 0.35;
-    let mut igralec = Player::new(40.0);
+    let mut igralec = Player::new(40.0, screen_height());
     let mut zemljevid = Zemljevid::new(Stopnja::Beginner);
 
     let mut score_accumulator: f32 = 0.0;
