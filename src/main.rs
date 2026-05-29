@@ -23,7 +23,7 @@ async fn main() {
 
         let osnovna_tla = screen_height() - 100.0; //tla kjer je igralec, če ni na nobeni ovire
         let mut trenutna_tla = osnovna_tla; //lahko je tudi na oviri ne samo na tleh
-        let mut na_tleh = false;
+        let mut na_oviri = false;
 
         zemljevid.posodobi();
 
@@ -57,13 +57,14 @@ async fn main() {
                     break;
                 }
                 IzidTrka::PristaniNaOviri(visina) => {
-                    na_tleh = true;
+                    na_oviri = true;
                     trenutna_tla = visina;
                 }
             }
+            
         }
 
-        if !na_tleh {
+        if !na_oviri {
             trenutna_tla = osnovna_tla;
         }
 
@@ -76,7 +77,7 @@ async fn main() {
         draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
         zemljevid.narisi(osnovna_tla);
         igralec.narisi(BLUE);
-
+ 
         next_frame().await
     }
 }

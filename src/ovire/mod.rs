@@ -6,8 +6,9 @@ pub enum Ovira {
     // Kvadrat deluje kot blok na katerega človeček lahko skoči in se 
     // naprej po njem premika. Če pade iz njega, se igrica nadaljuje. 
     // Če se zaletimo v stranico (ne skočimo nanj), se igrica ustavi.
-    Kvadrat {
-        stranica: f32,
+    Pravokotnik {
+        visina: f32,
+        sirina: f32,
     },
 
     //Trikotnik deluje kot spica: če se player zadane vanj, takoj umre.
@@ -25,7 +26,7 @@ pub enum IzidTrka {
 
 impl Ovira {
     pub fn nov_kvadrat(stranica: f32) -> Self {
-        Ovira::Kvadrat { stranica }
+        Ovira::Pravokotnik { visina: stranica, sirina: stranica }
     }
 
     pub fn nov_trikotnik(visina: f32, sirina: f32) -> Self {
@@ -34,47 +35,44 @@ impl Ovira {
 
     pub fn visina(&self) -> f32 {
         match self {
-            Ovira::Kvadrat { stranica } => *stranica,
+            Ovira::Pravokotnik { visina, .. } => *visina,
             Ovira::Trikotnik { visina, .. } => *visina,
         }
     }
 
     pub fn sirina(&self) -> f32 {
         match self {
-            Ovira::Kvadrat { stranica } => *stranica,
+            Ovira::Pravokotnik { sirina, .. } => *sirina,
             Ovira::Trikotnik { sirina, .. } => *sirina,
         }
     }
 
-    pub fn stolpen(&self) -> bool { // true ce lahko na lik damo drug lik
-        match self {
-            // lahko na kvadrat postavimo še druge ovire, naredimo "stolp"
-            Ovira::Kvadrat { .. } => true,
-            Ovira::Trikotnik { .. } => false,
-        }
-    }
-
-    pub fn naredi_stolp(visina: f32) -> Option<Self> {
-        if visina == 0. {
-            None
+    pub fn naredi_stolp(visina: f32) -> Self {
+        if visina <= 0. {
+            Ovira::Pravokotnik { 
+                visina: 0.,
+                sirina: 0.
+            }
         } else {
-            Some(Ovira::Kvadrat { 
-                stranica: visina
-            })
+            Ovira::Pravokotnik { 
+                visina: visina,
+                sirina: 50.
+            }
         }
     }
 
     pub fn narisi(&self, x: f32, y: f32, color: Color) {
         match self {
-            Ovira::Kvadrat { stranica } => {
-                let s = *stranica;
+            Ovira::Pravokotnik { visina, sirina } => {
+                let v = *visina;
+                let s= *sirina;
                 draw_rectangle(
-                    // (x,y) je zgornje levo oglišče kvadrata
+                    // (x,y) je zgornje levo oglišče pravokotnika
                     // ta bo postavljen na sredino ekrana
                     x,
-                    y - s, //minus stranica, da stoji na tleh
+                    y - v, //minus visina, da stoji na tleh
                     s,
-                    s,
+                    v,
                     color,
                 )
             },
@@ -94,16 +92,18 @@ impl Ovira {
     }
 
     pub fn preveri_trk(&self, o_x: f32, o_y:f32, p: &Player) -> IzidTrka {
-        let p_pravokotnik = Rect::new(p.x, p.y, p.stranica, p.stranica);
+        let p_pravokotnik = Rect::new(p.x, p.y, p.stranica, p.stranica); 
+        // pravokotnik, ki predstavlja igralca - p
 
         match self {
-            Ovira::Kvadrat { stranica } => {
-                let s = *stranica;
-                let o_pravokotnik = Rect::new(o_x, o_y - s, s, s);
+            Ovira::Pravokotnik { visina, sirina} => {
+                let v = *visina;
+                let s= *sirina;
+                let o_pravokotnik = Rect::new(o_x, o_y - v, s, v);
                 if p_pravokotnik.overlaps(&o_pravokotnik) {
                     // preverimo, ali smo pristali na kvadratu ali se zaleteli v stranico
-                    if p.y + p.stranica <= o_y + 5.0 { // pristali smo na kvadratu
-                        IzidTrka::PristaniNaOviri(o_y - s)
+                    if p.y + p.stranica <= o_y - 5.0 { // pristali smo na kvadratu, 5.0 višje, da program pravočasno zazna
+                        IzidTrka::PristaniNaOviri(o_y - v)
                     } else { // zaleteli smo se v stranico
                         IzidTrka::Smrt
                     }
