@@ -83,8 +83,6 @@ impl Ovira {
                 let w = *sirina;
                 let h = *visina;
 
-
-
                 // izračun oglišč trikotnika // UPORABLJAVA LEVO SPODNJE KRAJIŠČE ZA LAŽJI IZRAČUN POZICIJE
                 let v1 = vec2(x + w / 2.0, y - h );   // zgornje
                 let v2 = vec2(x , y ); // levo spodaj
