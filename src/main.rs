@@ -9,12 +9,12 @@ use ovire::*;
 use player::*;
 use zemljevid::*;
 
-#[macroquad::main("Geometry Dash Lite")]
+#[macroquad::main("Geometry Dash")]
 async fn main() {
     next_frame().await; // počakamo, da se naloži ekran
 
     let gravitacija = 0.35;
-    let mut igralec = Player::new(40.0);
+    let mut igralec = Player::new(40.0, screen_height());
     let mut zemljevid = Zemljevid::new(Stopnja::Beginner);
 
     loop {

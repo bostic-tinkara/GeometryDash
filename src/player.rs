@@ -11,11 +11,11 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(stranica: f32) -> Self {
-        // naredi novega igralca na x, y ( (0,0) mestu)
+    pub fn new(stranica: f32, screen_height: f32) -> Self {
+        // naredi novega igralca na (x, y) mestu
         Player {
             x: 40.,
-            y: screen_height() - 100. - stranica,
+            y: screen_height - 100. - stranica,
             stranica,
             skok: 150., // lahko preskoči oviro do višine 150
             y_hitrost: 0.,
@@ -33,7 +33,7 @@ impl Player {
         }
     }
 
-    pub fn lahko_preskoci(&self, ovira: Ovira) -> bool {
+    pub fn lahko_preskoci(&self, ovira: &Ovira) -> bool {
         let visina = ovira.visina();
         visina <= self.skok
     }
