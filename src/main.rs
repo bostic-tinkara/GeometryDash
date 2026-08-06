@@ -1,22 +1,26 @@
 mod ovire;
-mod player;
+mod igralec;
 mod testi;
 mod zemljevid;
 
 use macroquad::prelude::*;
 use ovire::*;
-use player::*;
+use igralec::*;
 use std::time::Duration;
 use zemljevid::*;
+use crate::zemljevid::beginner::Beginner;
+
 
 #[macroquad::main("Geometry Dash")]
 async fn main() {
+    rand::srand(miniquad::date::now() as u64); 
+    // če želimo, da se generator naključnih števil spreminja
+
     next_frame().await; // počakamo, da se naloži ekran
 
     let gravitacija = 0.35;
-    let mut igralec = Player::new(40.0, screen_height());
-    let mut zemljevid = Zemljevid::new(Stopnja::Beginner);
-
+    let mut igralec = Igralec::new(40.0, screen_height());
+    let mut zemljevid: Box<dyn Zemljevid> = Box::new(Beginner::new());
     let mut score_accumulator: f32 = 0.0;
     let mut best_score: u32 = 0;
     
@@ -44,7 +48,7 @@ async fn main() {
 
             if get_time() - cas_smrti > 1.0 { // igra se ponovno začne
                 score_accumulator = 0.0;
-                zemljevid = Zemljevid::new(Stopnja::Beginner);
+                zemljevid = Box::new(Beginner::new());
                 igralec.y = osnovna_tla - igralec.stranica;
                 igralec.y_hitrost = 0.0;
                 igralec.rotacija = 0.0;
@@ -66,25 +70,21 @@ async fn main() {
         let dt = get_frame_time();
         score_accumulator += 10.0 * dt;
 
-        for (o_x, ovira) in &zemljevid.poligon {
-            match ovira.preveri_trk(*o_x, trenutna_tla, &igralec) {
-                IzidTrka::None => {},
-                IzidTrka::Smrt => {
-                    dead = true;
-                    cas_smrti = get_time();
-
-                    if current_score > best_score {
-                        best_score = current_score;
-                    }
-
-                    break;
-                },
-                IzidTrka::PristaniNaOviri(visina) => {
-                    na_oviri = true;
-                    trenutna_tla = visina;
-                    igralec.rotacija = 0.0;
+        match zemljevid.preveri_trk(trenutna_tla, &igralec) {
+            IzidTrka::None => {},
+            IzidTrka::Smrt => {
+                dead = true;
+                cas_smrti = get_time();
+            
+                if current_score > best_score {
+                    best_score = current_score;
                 }
-            }
+            },
+            IzidTrka::PristaniNaOviri(visina) => {
+                na_oviri = true;
+                trenutna_tla = visina;
+                igralec.rotacija = 0.0;
+            },
         }
 
         if !na_oviri {

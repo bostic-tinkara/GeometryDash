@@ -1,7 +1,7 @@
 use crate::ovire::*;
 use macroquad::{color, prelude::*};
 
-pub struct Player {
+pub struct Igralec {
     pub x: f32, // koordinati, kjer se nahaja
     pub y: f32,
     pub stranica: f32,
@@ -11,10 +11,10 @@ pub struct Player {
     pub rotacija: f32,
 }
 
-impl Player {
+impl Igralec {
     pub fn new(stranica: f32, screen_height: f32) -> Self {
         // naredi novega igralca na (x, y) mestu
-        Player {
+        Igralec {
             x: 40.,
             y: screen_height - 100. - stranica,
             stranica,
@@ -35,7 +35,7 @@ impl Player {
         }
     }
 
-    pub fn lahko_preskoci(&self, ovira: &Ovira) -> bool {
+    pub fn lahko_preskoci<T: Ovira>(&self, ovira: &T) -> bool {
         let visina = ovira.visina();
         visina <= self.skok
     }
