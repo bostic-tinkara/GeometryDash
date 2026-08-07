@@ -14,6 +14,7 @@ pub enum IzidTrka {
 pub trait Ovira {
     fn visina(&self) -> f32;
     fn sirina(&self) -> f32;
+    fn oglisca(&self, x: f32, y: f32) -> Vec<Vec2>;
     fn narisi(&self, x: f32, y: f32, color: Color);
     fn preveri_trk(&self, o_x: f32, o_y: f32, p: &Igralec) -> IzidTrka;
 }

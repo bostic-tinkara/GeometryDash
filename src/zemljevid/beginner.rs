@@ -30,7 +30,7 @@ impl Beginner {
 
 impl Zemljevid for Beginner {
     fn dodaj_oviro(&mut self) {
-        let razdalja = rand::gen_range(200.0, 400.0);
+        let razdalja = rand::gen_range(150.0, 300.0);
 
         if rand::gen_range(0, 2) == 0 {
             // Kvadrat

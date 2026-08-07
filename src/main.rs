@@ -1,7 +1,8 @@
 mod ovire;
 mod igralec;
-mod testi;
 mod zemljevid;
+mod trki;
+mod testi;
 
 use macroquad::prelude::*;
 use ovire::*;
@@ -33,7 +34,6 @@ async fn main() {
         let osnovna_tla = screen_height() - 100.0; 
         let current_score = score_accumulator as u32;
 
-
         // ob trku
         if dead {
             let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
@@ -62,13 +62,19 @@ async fn main() {
         let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
         clear_background(bubble_gum);
 
-        let mut trenutna_tla = osnovna_tla;
-        let mut na_oviri = false;
-
         zemljevid.posodobi();
 
         let dt = get_frame_time();
         score_accumulator += 10.0 * dt;
+
+        let mut trenutna_tla = osnovna_tla;
+        let mut na_oviri = false;
+
+        if is_key_down(KeyCode::Space) {
+            igralec.skoci();
+        }
+
+        igralec.posodobi(gravitacija, trenutna_tla);
 
         match zemljevid.preveri_trk(trenutna_tla, &igralec) {
             IzidTrka::None => {},
@@ -83,6 +89,10 @@ async fn main() {
             IzidTrka::PristaniNaOviri(visina) => {
                 na_oviri = true;
                 trenutna_tla = visina;
+
+                // igralec pristane zgoraj
+                igralec.y = trenutna_tla - igralec.stranica;
+                igralec.y_hitrost = 0.0;
                 igralec.rotacija = 0.0;
             },
         }
@@ -91,12 +101,7 @@ async fn main() {
             trenutna_tla = osnovna_tla;
         }
 
-        if is_key_down(KeyCode::Space) {
-            igralec.skoci();
-        }
-
-        igralec.posodobi(gravitacija, trenutna_tla);
-
+        // Rotacija
         let v_zraku = igralec.y < trenutna_tla - igralec.stranica - 0.1;
         if v_zraku {
             igralec.rotacija += 400.0 * dt;
@@ -128,5 +133,4 @@ async fn main() {
 
         next_frame().await
     }
-
 }
