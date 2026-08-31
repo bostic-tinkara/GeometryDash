@@ -1,4 +1,5 @@
 pub mod beginner;
+pub mod advanced;
 
 use macroquad::prelude::*;
 use crate::{ovire::IzidTrka, igralec::Igralec};
