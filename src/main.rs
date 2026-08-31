@@ -17,6 +17,48 @@ enum IgralnoStanje {
     Pavza,
 }
 
+// Funkcija za risanje ozadja z bubble gum temo in dinamiko
+fn narisi_ozadje(stanje: &IgralnoStanje) {
+    // Osnovne barve palete
+    let bubble_gum = Color::from_rgba(255, 110, 199, 255);
+    let temna_magenta = Color::from_rgba(180, 50, 140, 255);
+    let crte_mreze = Color::from_rgba(255, 255, 255, 40); // Rahlo prosojna bela
+
+    clear_background(bubble_gum);
+
+    let sirina = screen_width();
+    let visina = screen_height();
+    let tla_y = visina - 100.0;
+
+    // 1. Risanje premikajoče se ozadne mreže za občutek globine
+    let velikost_mreze = 40.0;
+    let odmik_x = (get_time() * 30.0) as f32 % velikost_mreze;
+
+    // Navpične črte
+    let mut x = -odmik_x;
+    while x < sirina {
+        draw_line(x, 0.0, x, tla_y, 1.0, crte_mreze);
+        x += velikost_mreze;
+    }
+
+    // Vodoravne črte
+    let mut y = 0.0;
+    while y < tla_y {
+        draw_line(0.0, y, sirina, y, 1.0, crte_mreze);
+        y += velikost_mreze;
+    }
+
+    // 2. Tla z dvobarvnim vzorcem
+    draw_rectangle(0.0, tla_y, sirina, 100.0, temna_magenta);
+    draw_line(0.0, tla_y, sirina, tla_y, 4.0, WHITE); // Svetleč zgornji rob tal
+
+    // 3. Dodatni dekorativni gradientni sijaj na začetni strani
+    if let IgralnoStanje::Meni = stanje {
+        let cas = (get_time() * 2.0).sin() as f32 * 5.0;
+        draw_circle(sirina / 2.0, visina / 3.0 - 10.0, 180.0 + cas, Color::from_rgba(255, 255, 255, 20));
+    }
+}
+
 #[macroquad::main("Geometry Dash")]
 async fn main() {
     rand::srand(miniquad::date::now() as u64);
@@ -36,8 +78,7 @@ async fn main() {
     let mut stanje = IgralnoStanje::Meni;
 
     loop {
-        let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
-        clear_background(bubble_gum);
+        narisi_ozadje(&stanje);
 
         match stanje {
             IgralnoStanje::Meni => {
@@ -135,46 +176,46 @@ async fn main() {
                 draw_triangle(v1, v2, v3, barva_resume);
                 draw_triangle_lines(v1, v2, v3, 4.0, WHITE);
 
-                // 2. GUMB: RESTART (Kvadrat s tekstom "RESTART" ali "C") - Začne znova
-                let restart_x = screen_width() / 2.0 + 60.0;
+                // 2. GUMB: Pravilna okrogla krožna puščica (RESTART)
+                let restart_x = screen_width() / 2.0 + 80.0;
                 let restart_y = screen_height() / 2.0 + 20.0;
-                let restart_velikost = 60.0;
-                let restart_kvadrat = Rect::new(
-                    restart_x - restart_velikost / 2.0,
-                    restart_y - restart_velikost / 2.0,
-                    restart_velikost,
-                    restart_velikost,
+                let polmer = 18.0;
+
+                let restart_hitbox = Rect::new(
+                    restart_x - polmer - 10.0,
+                    restart_y - polmer - 10.0,
+                    (polmer + 10.0) * 2.0,
+                    (polmer + 10.0) * 2.0,
                 );
 
-                let miska_nad_restart = restart_kvadrat.contains(vec2(miska_x, miska_y));
-                let barva_restart = if miska_nad_restart { DARKBLUE } else { BLUE };
+                let miska_nad_restart = restart_hitbox.contains(vec2(miska_x, miska_y));
+                let barva = if miska_nad_restart { GREEN } else { WHITE };
 
-                draw_rectangle(
-                    restart_kvadrat.x,
-                    restart_kvadrat.y,
-                    restart_kvadrat.w,
-                    restart_kvadrat.h,
-                    barva_restart,
-                );
-                draw_rectangle_lines(
-                    restart_kvadrat.x,
-                    restart_kvadrat.y,
-                    restart_kvadrat.w,
-                    restart_kvadrat.h,
-                    3.0,
-                    WHITE,
-                );
+                // 1. Risanje ukrivljenega krožnega loka točko po točki
+                let stevi_tock = 20;
+                let zacetni_kot = 45.0 * std::f32::consts::PI / 180.0;
+                let koncni_kot = 320.0 * std::f32::consts::PI / 180.0;
+                let korak = (koncni_kot - zacetni_kot) / (stevi_tock as f32);
 
-                // Simbol za ponovni zagon na gumbu
-                let tekst_restart = "RESTART";
-                let r_mere = measure_text(tekst_restart, None, 40, 1.0);
-                draw_text(
-                    tekst_restart,
-                    restart_x - r_mere.width / 2.0,
-                    restart_y + r_mere.height / 2.0 - 2.0,
-                    40.0,
-                    WHITE,
-                );
+                for i in 0..stevi_tock {
+                    let k1 = zacetni_kot + (i as f32) * korak;
+                    let k2 = zacetni_kot + ((i + 1) as f32) * korak;
+
+                    let p1 = vec2(restart_x + polmer * k1.cos(), restart_y - polmer * k1.sin());
+                    let p2 = vec2(restart_x + polmer * k2.cos(), restart_y - polmer * k2.sin());
+
+                    draw_line(p1.x, p1.y, p2.x, p2.y, 3.5, barva);
+                }
+
+                // 2. Majhna trikotna konica na vrhu loka
+                let konica_x = restart_x + polmer * zacetni_kot.cos();
+                let konica_y = restart_y - polmer * zacetni_kot.sin();
+
+                let t1 = vec2(konica_x - 3.0, konica_y - 7.0);
+                let t2 = vec2(konica_x + 7.0, konica_y + 1.0);
+                let t3 = vec2(konica_x - 2.0, konica_y + 5.0);
+
+                draw_triangle(t1, t2, t3, barva);
 
                 draw_text(&format!("Score: {}", score_accumulator as u32), 10.0, 30.0, 30.0, WHITE);
                 draw_text(&format!("Best Score: {}", best_score), 10.0, 60.0, 30.0, WHITE);
