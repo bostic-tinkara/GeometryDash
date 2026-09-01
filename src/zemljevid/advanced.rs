@@ -1,8 +1,12 @@
 use macroquad::prelude::*;
 
 use crate::{
-    Ovira, 
-    ovire::{pravokotnik::Pravokotnik, trikotnik::Trikotnik, IzidTrka}, 
+    ovire::{
+        pravokotnik::Pravokotnik, 
+        trikotnik::Trikotnik, 
+        IzidTrka,
+        Ovira,
+    },
     igralec::Igralec,
 };
 
