@@ -16,8 +16,8 @@ async fn main() {
     rand::srand(miniquad::date::now() as u64);
     // če želimo, da se generator naključnih števil spreminja
 
-    let stopnja = Stopnja::Beginner;
-    let mut igra = Igra::new(stopnja);
+    let mut igra = Igra::new(Stopnja::Beginner);
+    let mut izbrana_stopnja = false;
     let mut stanje = IgralnoStanje::Meni;
 
     loop {
@@ -25,8 +25,8 @@ async fn main() {
 
         match stanje {
             IgralnoStanje::Meni => {
-                meni::posodobi(&mut stanje);
-                meni::narisi(igra.best_score);
+                meni::posodobi(&mut stanje, &mut igra, &mut izbrana_stopnja);
+                meni::narisi(igra.best_score, izbrana_stopnja);
             }
 
             IgralnoStanje::Pavza => {

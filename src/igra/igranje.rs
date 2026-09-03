@@ -137,8 +137,11 @@ impl Igra {
         let klik_za_skok = 
             is_mouse_button_pressed(MouseButton::Left) && !miska_nad_meni_gumbom;
         
-        if is_key_down(KeyCode::Space) || klik_za_skok {
+        if (is_key_pressed(KeyCode::Space) || klik_za_skok)
+            && self.igralec.skoki < self.stopnja.najvec_skokov()
+        {
             self.igralec.skoci();
+            self.igralec.skoki += 1;
         }
     }
 
@@ -169,6 +172,7 @@ impl Igra {
                 self.igralec.y = *trenutna_tla - self.igralec.stranica;
                 self.igralec.y_hitrost = 0.0;
                 self.igralec.rotacija = 0.0;
+                self.igralec.skoki = 0; // ponastavimo število možnih skokov
             }
         }
 
@@ -179,8 +183,9 @@ impl Igra {
         // Rotacija
         let na_tleh = self.igralec.y >= *trenutna_tla - self.igralec.stranica - 0.1;
 
-        if na_tleh {
+        if na_tleh && self.igralec.y_hitrost >= 0.0 {
             self.igralec.rotacija = 0.0;
+            self.igralec.skoki = 0;
         } else {
             self.igralec.rotacija += 400.0 * dt;
         }

@@ -6,7 +6,7 @@ use crate::{
         trikotnik::Trikotnik, 
         IzidTrka,
         Ovira,
-    }, 
+    },
     igralec::Igralec,
 };
 

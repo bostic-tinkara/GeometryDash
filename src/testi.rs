@@ -8,12 +8,10 @@ use crate::ovire::pravokotnik::Pravokotnik;
 #[test]
 fn test_player_new() {
     let igralec = Igralec::new(10., 800.);
-    let ovira = Trikotnik { visina: 130., sirina: 20. };
 
     assert_eq!(igralec.x, 40.);
     assert_eq!(igralec.stranica, 10.);
-    assert_eq!(igralec.skok, 150.);
-    assert_eq!(Igralec::lahko_preskoci(&igralec, &ovira), true);
+    assert_eq!(igralec.skok_visina, 150.);
 }
 
 #[test]

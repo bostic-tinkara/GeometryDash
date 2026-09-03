@@ -145,6 +145,7 @@ impl Advanced {
     }
 }
 
+
 impl Zemljevid for Advanced {
     fn dodaj_oviro(&mut self) {
         self.naredi_stolp();

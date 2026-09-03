@@ -26,4 +26,12 @@ pub fn naredi_zemljevid(stopnja: &Stopnja) -> Box<dyn Zemljevid> {
         Stopnja::Advanced => Box::new(advanced::Advanced::new()),
     }
 }
-// let zemljevid = ustvari_zemljevid(&stopnja);
+
+impl Stopnja {
+    pub fn najvec_skokov(&self) -> u32 {
+        match self {
+            Stopnja::Beginner => 1,
+            Stopnja::Advanced => 3,
+        }
+    }
+}
