@@ -1,39 +1,9 @@
 use macroquad::prelude::*;
 
 use crate::zemljevid::*;
-
+use super::gumbi::*;
 use super::igranje::Igra;
 use super::stanje::IgralnoStanje;
-
-pub fn miska_trikotni_gumb() -> bool {
-    // Zaznavanje premika miške nad trikotnikom (poenostavljen krog/kvadrat hit-box)
-    let (miska_x, miska_y) = mouse_position();
-
-    // --- TRIKOTNI "PLAY / RESUME" GUMB ---
-    let sredisce_x = screen_width() / 2.0;
-    let sredisce_y = screen_height() / 2.0 + 20.0;
-    let polmer = 50.0; // Velikost trikotnika
-
-    miska_x >= sredisce_x - polmer
-        && miska_x <= sredisce_x + polmer
-        && miska_y >= sredisce_y - polmer
-        && miska_y <= sredisce_y + polmer
-}
-
-pub fn miska_pravokotni_gumb(zamik_y: f32) -> bool {
-    let x = screen_width() / 2.0 - 100.0;
-    let y = screen_height() / 2.0 + zamik_y;
-    let gumb_sirina = 200.0;
-    let gumb_visina = 60.0;
-
-    let (miska_x, miska_y) = mouse_position();
-
-    miska_x >= x
-        && miska_x <= x + gumb_sirina
-        && miska_y >= y
-        && miska_y <= y + gumb_visina
-}
-
 
 pub fn posodobi(stanje: &mut IgralnoStanje, igra: &mut Igra, izbrana_stopnja: &mut bool) {
     if !*izbrana_stopnja {

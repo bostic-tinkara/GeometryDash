@@ -24,7 +24,7 @@ fn projekcija_lika(oglisca: &[Vec2], os: Vec2) -> (f32, f32) {
     (min, max) // interval (projekcija lika)
 }
 
-fn prekrivanje_intervalov(a: (f32, f32), b: (f32, f32)) -> bool {
+pub fn prekrivanje_intervalov(a: (f32, f32), b: (f32, f32)) -> bool {
     a.0 <= b.1 && b.0 <= a.1
 }
 

@@ -1,42 +1,31 @@
 use macroquad::prelude::*;
 
-use crate::igra::igranje::*;
-
+use super::igranje::*;
+use super::gumbi::*;
 use super::stanje::IgralnoStanje;
 
-fn resume_gumb() -> (Vec2, Vec2, Vec2, Rect) {
-    let x = screen_width() / 2.0 - 60.0;
-    let y = screen_height() / 2.0 + 20.0;
-    let polmer = 40.0;
 
-    let v1 = vec2(x - polmer * 0.5, y - polmer);
-    let v2 = vec2(x - polmer * 0.5, y + polmer);
-    let v3 = vec2(x + polmer, y);
+pub fn posodobi(stanje: &mut IgralnoStanje, igra: &mut Igra) {
+    let (_, _, _, resume_hitbox) = resume_gumb();
+    let (miska_x, miska_y) = mouse_position();
+    let miska_nad_resume = resume_hitbox.contains(vec2(miska_x, miska_y));
+    
+    // Klik na RESUME -> Nadaljuje igro
+    if (miska_nad_resume && is_mouse_button_pressed(MouseButton::Left))
+        || is_key_pressed(KeyCode::Space)
+    {
+        *stanje = IgralnoStanje::Igra;
+    }
 
-    let hitbox = Rect::new(
-        x - polmer,
-        y - polmer,
-        polmer * 2.0,
-        polmer * 2.0,
-    );
-
-    (v1, v2, v3, hitbox)
-}
-
-
-fn restart_gumb() -> (f32, f32, f32, Rect) {
-    let restart_x = screen_width() / 2.0 + 80.0;
-    let restart_y = screen_height() / 2.0 + 20.0;
-    let polmer = 18.0;
-
-    let hitbox = Rect::new(
-        restart_x - polmer - 10.0,
-        restart_y - polmer - 10.0,
-        (polmer + 10.0) * 2.0,
-        (polmer + 10.0) * 2.0,
-    );
-
-    (restart_x, restart_y, polmer, hitbox)
+    let (_, _, _, restart_hitbox) = restart_gumb();
+    let (miska_x, miska_y) = mouse_position();
+    let miska_nad_restart = restart_hitbox.contains(vec2(miska_x, miska_y));
+    
+    // Klik na RESTART -> Ponastavi igro in začne znova
+    if miska_nad_restart && is_mouse_button_pressed(MouseButton::Left) {
+        igra.ponovno_zazeni();
+        *stanje = IgralnoStanje::Igra;
+    }
 }
 
 
@@ -98,28 +87,4 @@ pub fn narisi(score_accumulator: f32, best_score: u32) {
 
     draw_text(&format!("Score: {}", score_accumulator as u32), 10.0, 30.0, 30.0, WHITE);
     draw_text(&format!("Best Score: {}", best_score), 10.0, 60.0, 30.0, WHITE);
-}
-
-
-pub fn posodobi(stanje: &mut IgralnoStanje, igra: &mut Igra) {
-    let (_, _, _, resume_hitbox) = resume_gumb();
-    let (miska_x, miska_y) = mouse_position();
-    let miska_nad_resume = resume_hitbox.contains(vec2(miska_x, miska_y));
-    
-    // Klik na RESUME -> Nadaljuje igro
-    if (miska_nad_resume && is_mouse_button_pressed(MouseButton::Left))
-        || is_key_pressed(KeyCode::Space)
-    {
-        *stanje = IgralnoStanje::Igra;
-    }
-
-    let (_, _, _, restart_hitbox) = restart_gumb();
-    let (miska_x, miska_y) = mouse_position();
-    let miska_nad_restart = restart_hitbox.contains(vec2(miska_x, miska_y));
-    
-    // Klik na RESTART -> Ponastavi igro in začne znova
-    if miska_nad_restart && is_mouse_button_pressed(MouseButton::Left) {
-        igra.ponovno_zazeni();
-        *stanje = IgralnoStanje::Igra;
-    }
 }

@@ -5,9 +5,9 @@ pub struct Igralec {
     pub y: f32, // (x, y) je zgornje levo oglisce
     pub stranica: f32,
     pub y_hitrost: f32, // Nova spremenljivka za hitrost skoka/padanja
-    pub skok_visina: f32,      // koliko lahko preskoči
     pub skok_moc: f32,  // Kako močan je začetni odriv
     pub skoki: u32,
+    pub je_skocil: bool,
     pub rotacija: f32,
 }
 
@@ -19,9 +19,9 @@ impl Igralec {
             y: screen_height - 100. - stranica,
             stranica,
             y_hitrost: 0.,
-            skok_visina: 150., // lahko preskoči oviro do višine 150
             skok_moc: -9., //negativno, ker gremo navzgor
             skoki: 0,
+            je_skocil: false,
             rotacija: 0.,
         }
     }
@@ -49,10 +49,12 @@ impl Igralec {
         if self.y > tla_y - self.stranica {
             self.y = tla_y - self.stranica;
             self.y_hitrost = 0.;
+            self.je_skocil = false;
         }
     }
 
     pub fn skoci(&mut self) {
+        self.je_skocil = true;
         self.y_hitrost = self.skok_moc;
     }
 

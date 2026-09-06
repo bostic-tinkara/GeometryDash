@@ -6,6 +6,7 @@ use crate::zemljevid::{Stopnja, Zemljevid, naredi_zemljevid};
 use crate::{IgralnoStanje, ovire::IzidTrka};
 
 const GRAVITACIJA: f32 = 0.35;
+const VISINA_TAL: f32 = 150.0;
 
 pub struct Igra {
     pub igralec: Igralec,
@@ -44,7 +45,7 @@ impl Igra {
         let dt = get_frame_time();
         self.score_accumulator += 10.0 * dt;
 
-        let osnovna_tla = screen_height() - 100.0;
+        let osnovna_tla = screen_height() - VISINA_TAL;
         let mut trenutna_tla = osnovna_tla;
         let mut na_oviri = false;
 
@@ -59,25 +60,21 @@ impl Igra {
     pub fn narisi(&self) {
         //tla, kjer je igralec, če ni na nobeni oviri 
         // (lahko je tudi na oviri, ne samo na tleh)
-        let osnovna_tla = screen_height() - 100.0;
+        let osnovna_tla = screen_height() - VISINA_TAL;
         let current_score = self.score_accumulator as u32;
+
+        self.zemljevid.narisi(osnovna_tla);
 
         // Risanje ob smrti
         if self.dead {
-            let bubble_gum = Color::new(1.00, 0.43, 0.76, 1.00);
-            clear_background(bubble_gum);
-            draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
-            self.zemljevid.narisi(osnovna_tla);
-
-            let sinus = (get_time() * 25.0).sin(); // ko igralec umre, utripa
+            // ko igralec umre, utripa
+            let sinus = (get_time() * 10.0).sin();
             if sinus > 0.0 {
                 self.igralec.narisi(BLUE);
             }
+
         } else {
             // RISANJE IGRE
-            draw_line(0.0, osnovna_tla, screen_width(), osnovna_tla, 2.0, WHITE);
-        
-            self.zemljevid.narisi(osnovna_tla);
             self.igralec.narisi(BLUE);
         }
 
@@ -108,7 +105,7 @@ impl Igra {
 
 
     fn posodobi_smrt(&mut self) {
-        if get_time() - self.cas_smrti > 1.0 {
+        if get_time() - self.cas_smrti > 2.0 {
             // igra se ponovno začne
             self.ponovno_zazeni();
         }
@@ -152,6 +149,10 @@ impl Igra {
         osnovna_tla: f32,
         dt: f32
     ) {
+        // ponastavimo
+        *na_oviri = false;
+        *trenutna_tla = osnovna_tla;
+
         self.igralec.posodobi(GRAVITACIJA, *trenutna_tla);
 
         match self.zemljevid.preveri_trk(*trenutna_tla, &self.igralec) {
@@ -176,34 +177,28 @@ impl Igra {
             }
         }
 
-        if !*na_oviri {
-            *trenutna_tla = osnovna_tla;
-        }
-
         // Rotacija
-        let na_tleh = self.igralec.y >= *trenutna_tla - self.igralec.stranica - 0.1;
+        let na_tleh = self.igralec.y >= *trenutna_tla - self.igralec.stranica - 0.5;
 
         if na_tleh && self.igralec.y_hitrost >= 0.0 {
+            self.igralec.je_skocil = false;
             self.igralec.rotacija = 0.0;
             self.igralec.skoki = 0;
-        } else {
+        } else if self.igralec.je_skocil {
+            // ob skoku se ves čas vrti
             self.igralec.rotacija += 400.0 * dt;
+        } else {
+            // poravnan pade dol z ovir
+            self.igralec.rotacija = 0.0;
         }
 
-        // let v_zraku = igralec.y < trenutna_tla - igralec.stranica - 0.1;
-        // if v_zraku {
-        //     igralec.rotacija += 400.0 * dt;
-        // } else {
-        //     let ciljna_poravnava = (igralec.rotacija / 90.0).round() * 90.0;
-        //     igralec.rotacija += (ciljna_poravnava - igralec.rotacija) * 0.3;
-        // }
     }
 
     pub fn ponovno_zazeni(&mut self) {
         self.score_accumulator = 0.0;
         self.zemljevid = naredi_zemljevid(&self.stopnja);
 
-        let osnovna_tla = screen_height() - 100.0;
+        let osnovna_tla = screen_height() - VISINA_TAL;
         self.igralec.y = osnovna_tla - self.igralec.stranica;
         self.igralec.y_hitrost = 0.0;
         self.igralec.rotacija = 0.0;

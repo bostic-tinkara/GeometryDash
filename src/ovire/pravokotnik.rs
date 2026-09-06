@@ -19,6 +19,13 @@ impl Pravokotnik {
             sirina,
         }
     }
+
+    pub fn new(visina: f32, sirina: f32) -> Self {
+        Pravokotnik {
+            visina,
+            sirina,
+        }
+    }
 }
 
 impl Ovira for Pravokotnik {
@@ -61,9 +68,9 @@ impl Ovira for Pravokotnik {
 
         // preverimo, ali smo pristali na kvadratu ali se zaleteli v stranico
         let vrh_ovire = o_y - self.visina;
-        if p.y_hitrost > 0.0 // igralec pada pol
-            && p.y + p.stranica <= vrh_ovire + p.y_hitrost 
-            // igralec je dovolj blizu ovire
+        if p.y_hitrost > 0.0 // igralec pada dol
+        && p.y + p.stranica <= vrh_ovire + p.y_hitrost 
+        // igralec je dovolj blizu ovire
         { 
             // pristali smo na pravokotniku
             IzidTrka::PristaniNaOviri(vrh_ovire)
@@ -72,4 +79,5 @@ impl Ovira for Pravokotnik {
             IzidTrka::Smrt
         }
     }
+
 }

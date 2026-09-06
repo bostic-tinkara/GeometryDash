@@ -9,7 +9,7 @@ use macroquad::prelude::*;
 use igra::igranje::Igra;
 use igra::stanje::IgralnoStanje;
 use zemljevid::Stopnja;
-use igra::{meni, pavza};
+
 
 #[macroquad::main("Geometry Dash")]
 async fn main() {
@@ -21,25 +21,9 @@ async fn main() {
     let mut stanje = IgralnoStanje::Meni;
 
     loop {
-        igra::ozadje::narisi_ozadje(&stanje);
+        igra::posodobi(&mut stanje, &mut igra, &mut izbrana_stopnja);
+        igra::narisi(&stanje, &igra, izbrana_stopnja);
 
-        match stanje {
-            IgralnoStanje::Meni => {
-                meni::posodobi(&mut stanje, &mut igra, &mut izbrana_stopnja);
-                meni::narisi(igra.best_score, izbrana_stopnja);
-            }
-
-            IgralnoStanje::Pavza => {
-                pavza::posodobi(&mut stanje, &mut igra);
-                pavza::narisi(igra.score_accumulator, igra.best_score);
-            }
-
-            IgralnoStanje::Igra => {
-                igra.posodobi(&mut stanje);
-                igra.narisi();
-            }
-        }
-            
         next_frame().await;
     }
 }
