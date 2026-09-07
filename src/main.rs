@@ -1,5 +1,6 @@
 mod igralec;
 mod ovire;
+#[cfg(test)]
 mod testi;
 mod trki;
 mod zemljevid;

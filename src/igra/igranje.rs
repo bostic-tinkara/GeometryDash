@@ -37,7 +37,7 @@ impl Igra {
     pub fn new(stopnja: Stopnja) -> Self {
         Self {
             igralec: Igralec::new(40.0, screen_height()),
-            stopnja: stopnja,
+            stopnja,
             zemljevid: naredi_zemljevid(&stopnja),
             score_accumulator: 0.0,
             best_score: 0,
@@ -119,10 +119,11 @@ impl Igra {
             return;
         }
 
-        // set up za igro
-        self.zemljevid.posodobi();
-
         let dt = get_frame_time();
+
+        // set up za igro
+        self.zemljevid.posodobi(dt);
+
         self.score_accumulator += 10.0 * dt;
 
         let osnovna_tla = screen_height() - VISINA_TAL;

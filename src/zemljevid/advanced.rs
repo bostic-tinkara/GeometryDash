@@ -10,7 +10,7 @@ use crate::{
     igralec::Igralec,
 };
 
-use super::Zemljevid;
+use super::{Zemljevid, ZACETNA_HITROST, ZAKASNITEV_POSPESKA, POSPESEK_NA_SEKUNDO, NAJVECJA_HITROST};
 
 
 #[derive(Clone, Copy, PartialEq)]
@@ -39,13 +39,15 @@ pub struct Advanced {
     // poligon je sestavljen iz stolpov
     pub poligon: Vec<Stolp>,
     pub hitrost: f32,
+    pub cas: f32, // koliko sekund se že igra (za postopno pospeševanje)
 }
 
 impl Advanced {
     pub fn new() -> Self {
         Self {
             poligon: Vec::new(),
-            hitrost: 3.0,
+            hitrost: ZACETNA_HITROST,
+            cas: 0.0,
         }
     }
 
@@ -183,7 +185,14 @@ impl Zemljevid for Advanced {
     }
 
 
-    fn posodobi(&mut self) {
+    fn posodobi(&mut self, dt: f32) {
+        // prvih ZAKASNITEV_POSPESKA sekund se hitrost ne spreminja,
+        // nato zelo počasi raste v neskončnost
+        self.cas += dt;
+        if self.cas > ZAKASNITEV_POSPESKA {
+            self.hitrost = (self.hitrost + POSPESEK_NA_SEKUNDO * dt).min(NAJVECJA_HITROST);
+        }
+
         for stolp in &mut self.poligon { // gibanje ovir/stolpov
             stolp.x -= self.hitrost;
         }
