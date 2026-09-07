@@ -3,6 +3,7 @@ use macroquad::prelude::*;
 use super::igranje::*;
 use super::gumbi::*;
 use super::stanje::IgralnoStanje;
+use crate::zemljevid::Stopnja;
 
 
 pub fn posodobi(stanje: &mut IgralnoStanje, igra: &mut Igra) {
@@ -26,10 +27,20 @@ pub fn posodobi(stanje: &mut IgralnoStanje, igra: &mut Igra) {
         igra.ponovno_zazeni();
         *stanje = IgralnoStanje::Igra;
     }
+
+    let (_, _, _, _, stopnja_hitbox) = stopnja_gumb();
+    let (miska_x, miska_y) = mouse_position();
+    let miska_nad_stopnjo = stopnja_hitbox.contains(vec2(miska_x, miska_y));
+
+    // Klik na STOPNJA -> zamenja stopnjo in pripravi novo igro (ostane v pavzi)
+    if miska_nad_stopnjo && is_mouse_button_pressed(MouseButton::Left) {
+        igra.stopnja = igra.stopnja.naslednja();
+        igra.ponovno_zazeni();
+    }
 }
 
 
-pub fn narisi(score_accumulator: f32, best_score: u32) {
+pub fn narisi(score_accumulator: f32, best_score: u32, stopnja: Stopnja) {
     // Naslov
     let naslov = "RESUME";
     let naslov_velikost = 40.0;
@@ -84,6 +95,24 @@ pub fn narisi(score_accumulator: f32, best_score: u32) {
     let t3 = vec2(konica_x - 2.0, konica_y + 5.0);
 
     draw_triangle(t1, t2, t3, barva);
+
+    // 3. GUMB: Preklop STOPNJE (Beginner <-> Advanced)
+    let (sx, sy, s_sirina, s_visina, s_hitbox) = stopnja_gumb();
+    let miska_nad_stopnjo = s_hitbox.contains(vec2(miska_x, miska_y));
+    let barva_stopnja = if miska_nad_stopnjo { DARKBLUE } else { BLUE };
+
+    draw_rectangle(sx, sy, s_sirina, s_visina, barva_stopnja);
+    draw_rectangle_lines(sx, sy, s_sirina, s_visina, 2.5, WHITE);
+
+    let tekst = format!("STOPNJA: {}", stopnja.ime());
+    let tekst_sirina = measure_text(&tekst, None, 22, 1.0).width;
+    draw_text(
+        &tekst,
+        sx + (s_sirina - tekst_sirina) / 2.0,
+        sy + s_visina / 2.0 + 8.0,
+        22.0,
+        WHITE,
+    );
 
     draw_text(&format!("Score: {}", score_accumulator as u32), 10.0, 30.0, 30.0, WHITE);
     draw_text(&format!("Best Score: {}", best_score), 10.0, 60.0, 30.0, WHITE);

@@ -34,4 +34,20 @@ impl Stopnja {
             Stopnja::Advanced => 3,
         }
     }
+
+    /// Ime stopnje za prikaz na gumbih.
+    pub fn ime(&self) -> &'static str {
+        match self {
+            Stopnja::Beginner => "BEGINNER",
+            Stopnja::Advanced => "ADVANCED",
+        }
+    }
+
+    /// Naslednja stopnja v krogu (za preklop v pavzi).
+    pub fn naslednja(&self) -> Stopnja {
+        match self {
+            Stopnja::Beginner => Stopnja::Advanced,
+            Stopnja::Advanced => Stopnja::Beginner,
+        }
+    }
 }

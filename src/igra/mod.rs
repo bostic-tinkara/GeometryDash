@@ -41,7 +41,7 @@ pub fn narisi(
             meni::narisi(igra.best_score, izbrana_stopnja),
 
         IgralnoStanje::Pavza =>
-            pavza::narisi(igra.score_accumulator, igra.best_score),
+            pavza::narisi(igra.score_accumulator, igra.best_score, igra.stopnja),
 
         IgralnoStanje::Igra => 
             igra.narisi(),
