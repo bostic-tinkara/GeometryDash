@@ -1,12 +1,15 @@
-name: Build Windows
+name: Build Releases
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
@@ -15,7 +18,84 @@ jobs:
 
       - run: cargo build --release
 
+      - name: Create ZIP
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release
+          Copy-Item target/release/GeometryDash.exe release/
+          Copy-Item -Recurse assets release/
+          Compress-Archive -Path release/* -DestinationPath GeometryDash-Windows.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: GeometryDash-Windows
-          path: target/release/GeometryDash.exe
+          path: GeometryDash-Windows.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: cargo build --release
+
+      - name: Create ZIP
+        run: |
+          mkdir release
+          cp target/release/GeometryDash release/
+          cp -r assets release/
+          zip -r GeometryDash-Linux.zip release/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeometryDash-Linux
+          path: GeometryDash-Linux.zip
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: cargo build --release
+
+      - name: Create ZIP
+        run: |
+          mkdir release
+          cp target/release/GeometryDash release/
+          cp -r assets release/
+          zip -r GeometryDash-macOS.zip release/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeometryDash-macOS
+          path: GeometryDash-macOS.zip
+
+  release:
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest
+          prerelease: true
+          files: |
+            artifacts/GeometryDash-Windows/GeometryDash-Windows.zip
+            artifacts/GeometryDash-Linux/GeometryDash-Linux.zip
+            artifacts/GeometryDash-macOS/GeometryDash-macOS.zip
