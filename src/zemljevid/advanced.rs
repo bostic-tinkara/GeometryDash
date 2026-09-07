@@ -32,7 +32,7 @@ pub struct Stolp {
     // stolp iz ovir
     pub x: f32,
     pub ovire: Vec<PostavitevOvir>,
-    pub razdalja: f32, // razdalja od naslednjega stolpa
+    pub razdalja: f32, // razdalja do naslednjega stolpa
 }
 
 pub struct Advanced {
@@ -89,7 +89,7 @@ impl Advanced {
             razdalja: rand::gen_range(150.0, 300.0),
         };
                 
-        let zreb = rand::gen_range(0, 5);
+        let zreb = rand::gen_range(0, 4);
 
         if zreb == 0 {
             // petina ovir bo posameznih oz. zaporednih (ena zraven druge)
@@ -111,11 +111,8 @@ impl Advanced {
                     sirina,
                 );
             }
-        
-        } else if zreb == 1 { 
-            // pavza
 
-        } else if zreb == 2 {
+        } else if zreb == 1 {
             // stopnice (pravokotniki po diagonali)
             let stevilo = rand::gen_range(2, 5);
             let visina = 30.0;
