@@ -20,9 +20,12 @@ pub fn posodobi(
         IgralnoStanje::Pavza =>
             pavza::posodobi(stanje, igra),
 
-        IgralnoStanje::Igra => 
+        IgralnoStanje::Igra =>
             igra.posodobi(stanje),
     }
+
+    // uskladimo glasbo (meni / igra / jingle ob smrti) s trenutnim stanjem
+    igra.posodobi_glasbo(stanje);
 }
 
 

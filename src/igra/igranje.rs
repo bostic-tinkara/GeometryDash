@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use macroquad::audio::{play_sound, stop_sound, PlaySoundParams, Sound};
 
 use crate::igra::gumbi;
 use crate::igralec::Igralec;
@@ -8,6 +9,14 @@ use crate::{IgralnoStanje, ovire::IzidTrka};
 const GRAVITACIJA: f32 = 0.35;
 const VISINA_TAL: f32 = 150.0;
 
+/// Katera glasba v zanki se trenutno predvaja.
+#[derive(PartialEq, Clone, Copy)]
+enum Predvajano {
+    Nobena,
+    Meni,
+    Igra,
+}
+
 pub struct Igra {
     pub igralec: Igralec,
     pub stopnja: Stopnja,
@@ -16,6 +25,11 @@ pub struct Igra {
     pub best_score: u32,
     pub dead: bool,
     pub cas_smrti: f64,
+    pub glasba: Option<Sound>,
+    pub glasba_meni: Option<Sound>,
+    pub smrt_jingle: Option<Sound>,
+    predvajano: Predvajano,
+    smrt_odigrana: bool,
 }
 
 
@@ -29,7 +43,73 @@ impl Igra {
             best_score: 0,
             dead: false,
             cas_smrti: 0.0,
+            glasba: None,
+            glasba_meni: None,
+            smrt_jingle: None,
+            predvajano: Predvajano::Nobena,
+            smrt_odigrana: false,
         }
+    }
+
+    /// Uskladi predvajanje glasbe s stanjem igre:
+    /// - v meniju in v pavzi (resume) se vrti glasba menija,
+    /// - med igranjem glasba ozadja,
+    /// - ob smrti se enkrat predvaja kratek jingle, glasba ozadja pa utihne.
+    pub fn posodobi_glasbo(&mut self, stanje: &IgralnoStanje) {
+        // Enkratni jingle ob smrti.
+        if self.dead {
+            if !self.smrt_odigrana {
+                if let Some(jingle) = &self.smrt_jingle {
+                    play_sound(jingle, PlaySoundParams { looped: false, volume: 0.6 });
+                }
+                self.smrt_odigrana = true;
+            }
+        } else {
+            self.smrt_odigrana = false;
+        }
+
+        // Katera glasba v zanki naj se predvaja.
+        let zeljena = match stanje {
+            IgralnoStanje::Meni | IgralnoStanje::Pavza => Predvajano::Meni,
+            IgralnoStanje::Igra if !self.dead => Predvajano::Igra,
+            _ => Predvajano::Nobena,
+        };
+
+        if zeljena == self.predvajano {
+            return;
+        }
+
+        // Ustavimo prejšnjo skladbo.
+        match self.predvajano {
+            Predvajano::Meni => {
+                if let Some(s) = &self.glasba_meni {
+                    stop_sound(s);
+                }
+            }
+            Predvajano::Igra => {
+                if let Some(s) = &self.glasba {
+                    stop_sound(s);
+                }
+            }
+            Predvajano::Nobena => {}
+        }
+
+        // Zaženemo novo skladbo.
+        match zeljena {
+            Predvajano::Meni => {
+                if let Some(s) = &self.glasba_meni {
+                    play_sound(s, PlaySoundParams { looped: true, volume: 0.5 });
+                }
+            }
+            Predvajano::Igra => {
+                if let Some(s) = &self.glasba {
+                    play_sound(s, PlaySoundParams { looped: true, volume: 0.5 });
+                }
+            }
+            Predvajano::Nobena => {}
+        }
+
+        self.predvajano = zeljena;
     }
 
     pub fn posodobi(&mut self, stanje: &mut IgralnoStanje) {
