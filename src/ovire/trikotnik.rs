@@ -20,10 +20,6 @@ impl Trikotnik {
 }
 
 impl Ovira for Trikotnik {
-    fn visina(&self) -> f32 {
-        self.visina
-    }
-    
     fn sirina(&self) -> f32 {
         self.sirina
     }

@@ -10,7 +10,7 @@ use crate::{
     igralec::Igralec,
 };
 
-use super::Zemljevid;
+use super::{Zemljevid, ZACETNA_HITROST, ZAKASNITEV_POSPESKA, POSPESEK_NA_SEKUNDO, NAJVECJA_HITROST};
 
 pub struct PostavitevOvir {
     pub x: f32,
@@ -21,13 +21,15 @@ pub struct PostavitevOvir {
 pub struct Beginner {
     pub poligon: Vec<PostavitevOvir>,
     pub hitrost: f32,
+    pub cas: f32, // koliko sekund se že igra (za postopno pospeševanje)
 }
 
 impl Beginner {
     pub fn new() -> Self {
         Self {
             poligon: Vec::new(),
-            hitrost: 3.0,
+            hitrost: ZACETNA_HITROST,
+            cas: 0.0,
         }
     }
 }
@@ -56,7 +58,14 @@ impl Zemljevid for Beginner {
     }
 
 
-    fn posodobi(&mut self) {
+    fn posodobi(&mut self, dt: f32) {
+        // prvih ZAKASNITEV_POSPESKA sekund se hitrost ne spreminja,
+        // nato zelo počasi raste v neskončnost
+        self.cas += dt;
+        if self.cas > ZAKASNITEV_POSPESKA {
+            self.hitrost = (self.hitrost + POSPESEK_NA_SEKUNDO * dt).min(NAJVECJA_HITROST);
+        }
+
         for postavitev in &mut self.poligon { // gibanje ovir
             postavitev.x -= self.hitrost;
         }
