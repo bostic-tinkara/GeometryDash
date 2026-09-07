@@ -64,6 +64,17 @@ pub fn resume_gumb() -> (Vec2, Vec2, Vec2, Rect) {
     (v1, v2, v3, hitbox)
 }
 
+pub fn stopnja_gumb() -> (f32, f32, f32, f32, Rect) {
+    let sirina = 220.0;
+    let visina = 45.0;
+    let x = screen_width() / 2.0 - sirina / 2.0;
+    let y = screen_height() / 2.0 + 90.0;
+
+    let hitbox = Rect::new(x, y, sirina, visina);
+
+    (x, y, sirina, visina, hitbox)
+}
+
 pub fn restart_gumb() -> (f32, f32, f32, Rect) {
     let restart_x = screen_width() / 2.0 + 80.0;
     let restart_y = screen_height() / 2.0 + 20.0;
