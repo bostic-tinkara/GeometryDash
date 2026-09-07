@@ -1,0 +1,21 @@
+name: Build Windows
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: cargo build --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeometryDash-Windows
+          path: target/release/GeometryDash.exe
