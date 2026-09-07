@@ -13,7 +13,7 @@ pub fn narisi_ozadje(stanje: &IgralnoStanje, dead: bool) {
     let sirina = screen_width();
     let visina = screen_height();
     let tla_y = visina - 150.0;
-    let strop_y = tla_y - 450.0;
+    let strop_y = tla_y - 500.0;
 
     // 1. Risanje premikajoče se ozadne mreže za občutek globine
     let velikost_mreze = 40.0;
